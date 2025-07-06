@@ -1,5 +1,23 @@
 import { Button } from 'antd';
+import { useState } from 'react';
+import { SettingsDrawer } from './SettingsDrawer';
 
 export function SettingsButton() {
-    return <Button type="primary">Ustawienia</Button>;
+    const [drawerOpen, setDrawerOpen] = useState(false);
+
+    const handleButtonClick = () => {
+        setDrawerOpen(true);
+    };
+
+    return (
+        <>
+            <SettingsDrawer
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+            />
+            <Button type='primary' onClick={handleButtonClick}>
+                Ustawienia
+            </Button>
+        </>
+    );
 }

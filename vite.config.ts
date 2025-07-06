@@ -3,5 +3,12 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-    plugins: [react(), tailwindcss()]
+    plugins: [react(), tailwindcss()],
+    server: {
+        proxy: {
+            '/products': 'http://localhost:3000',
+            '/signIn': 'http://localhost:3000',
+            '/signOut': 'http://localhost:3000'
+        }
+    }
 });

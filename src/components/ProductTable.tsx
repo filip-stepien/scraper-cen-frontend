@@ -1,66 +1,92 @@
-import { Flex, Table } from 'antd';
-import type { TablePaginationConfig, TableProps } from 'antd';
+import { Empty, Flex, Table } from 'antd';
 import dayjs from 'dayjs';
+import type { TableProps } from 'antd';
 import type { PriceData, Product } from '../types';
 import { useProducts } from '../hooks/useProducts';
 import { Thumbnail } from './Thumbnail';
 import { PriceIndicator } from './PriceIndicator';
-import { useState } from 'react';
 
 type DataType = {
     key: string;
 } & Product;
 
+function getLastPrices(prices: Required<PriceData>[]): {
+    current: Required<PriceData> | null;
+    prev: Required<PriceData> | null;
+} {
+    if (prices.length === 0) {
+        return { current: null, prev: null };
+    }
+
+    const sortedPrices = [...prices].sort((a, b) => b.changedAt - a.changedAt);
+
+    return {
+        current: sortedPrices[0],
+        //prev: sortedPrices.length > 1 ? sortedPrices[1] : null
+        prev: { changedAt: dayjs(0).unix(), price: 100 }
+    };
+}
+
 const columns: TableProps<DataType>['columns'] = [
     {
         title: 'Miniatura',
         dataIndex: 'imageUrl',
+        width: '10%',
         key: 'imageUrl',
         align: 'center',
-        ellipsis: false,
         render: imgUrl => (
-            <Flex justify="center">
-                <Thumbnail imageUrl={imgUrl} sizePx={50} />
+            <Flex justify='center'>
+                <Thumbnail imageUrl={imgUrl} sizePx={80} />
             </Flex>
         )
     },
     {
+        title: 'Nazwa',
+        dataIndex: 'name',
+        key: 'name',
+        width: '30%'
+    },
+    {
         title: 'EAN',
         dataIndex: 'ean',
-        key: 'ean'
+        key: 'ean',
+        width: '12%'
     },
     {
         title: 'Kategoria',
         dataIndex: 'category',
-        key: 'category'
-    },
-    {
-        title: 'Producent',
-        dataIndex: 'brandName',
-        key: 'brandName'
-    },
-    {
-        title: 'Nazwa',
-        dataIndex: 'name',
-        key: 'name'
+        key: 'category',
+        width: '20%'
     },
     {
         title: 'Data aktualizacji',
         dataIndex: 'prices',
-        key: 'changeTimestamp',
-        render: (prices: Required<PriceData>) =>
-            dayjs.unix(prices.changeTimestamp).format('DD.MM.YYYY')
+        key: 'prices',
+        width: 200,
+        render: (prices: Required<PriceData>[]) => {
+            const lastPrices = getLastPrices(prices);
+            return lastPrices.current
+                ? dayjs.unix(lastPrices.current.changedAt).format('DD.MM.YYYY')
+                : 'Brak danych.';
+        }
     },
     {
         title: 'Aktualna cena',
         dataIndex: 'prices',
-        key: 'currentPrice',
-        render: (prices: Required<PriceData>) => (
-            <PriceIndicator
-                oldPrice={prices.prevPrice}
-                newPrice={prices.price}
-            />
-        )
+        key: 'prices',
+        width: 160,
+        fixed: 'right',
+        render: (prices: Required<PriceData>[]) => {
+            const { current, prev } = getLastPrices(prices);
+            return current ? (
+                <PriceIndicator
+                    prevPrice={prev?.price}
+                    currentPrice={current.price}
+                />
+            ) : (
+                'Brak danych.'
+            );
+        }
     }
 ];
 
@@ -68,7 +94,7 @@ function filterUndefinedValues(product: Product): product is Required<Product> {
     const isValid = (obj: Product | PriceData) =>
         Object.values(obj).every(value => value !== undefined);
 
-    return isValid(product) && isValid(product.prices);
+    return isValid(product) && product.prices.every(isValid);
 }
 
 function getRowsFromProducts(products: Product[]): DataType[] {
@@ -78,42 +104,52 @@ function getRowsFromProducts(products: Product[]): DataType[] {
     }));
 }
 
-type Pagination = {
-    pageSize: number;
-    pageNumber: number;
-};
-
 export function ProductTable() {
-    const [pagination, setPagination] = useState<Pagination>({
-        pageSize: 1,
-        pageNumber: 10
-    });
+    const { products, pagination } = useProducts('castorama');
 
-    const { products } = useProducts(
-        pagination.pageNumber,
-        pagination.pageSize
-    );
-
-    const handleTableChange: TableProps<DataType>['onChange'] = ({
-        current,
-        pageSize
-    }) => {
-        setPagination({ pageNumber: current, pageSize });
+    const handleTableChange: TableProps<DataType>['onChange'] = tablePage => {
+        pagination.setPageNumber(tablePage.current);
+        pagination.setPageSize(tablePage.pageSize);
     };
 
     return (
         <div
             style={{
                 padding: '16px'
-                //boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px'
             }}
         >
-            <Table<DataType>
-                size="small"
-                columns={columns}
-                dataSource={getRowsFromProducts(products)}
-                onChange={handleTableChange}
-            />
+            {products.error ? (
+                <Empty
+                    style={{ padding: '32px' }}
+                    description='Wystąpił błąd przy pobieraniu produktów.'
+                />
+            ) : (
+                <Table<DataType>
+                    size='small'
+                    loading={products.loading}
+                    locale={{
+                        emptyText: () => (
+                            <Empty
+                                description='Brak danych.'
+                                style={{ padding: '32px' }}
+                            />
+                        )
+                    }}
+                    columns={columns}
+                    pagination={{
+                        current: pagination.pageNumber,
+                        pageSize: pagination.pageSize,
+                        total: pagination.total,
+                        locale: { items_per_page: ' / strona' }
+                    }}
+                    expandable={{
+                        expandedRowRender: () => <div>ceny</div>
+                    }}
+                    dataSource={getRowsFromProducts(products.data)}
+                    onChange={handleTableChange}
+                    scroll={{ y: 'calc(100vh - 208px)', x: 'max-content' }}
+                />
+            )}
         </div>
     );
 }

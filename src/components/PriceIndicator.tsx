@@ -1,10 +1,10 @@
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import { Flex } from 'antd';
+import { Space } from 'antd';
 import type { JSX } from 'react';
 
 type Props = {
-    oldPrice: number;
-    newPrice: number;
+    currentPrice: number;
+    prevPrice?: number | null;
 };
 
 type Icon = {
@@ -23,23 +23,23 @@ const icons: Record<string, Icon> = {
     }
 };
 
-export function PriceIndicator({ oldPrice, newPrice }: Props) {
-    if (newPrice === oldPrice) {
-        return <span>{newPrice}</span>;
+export function PriceIndicator({ prevPrice, currentPrice }: Props) {
+    if (!prevPrice || prevPrice === currentPrice) {
+        return <span>{currentPrice}</span>;
     }
 
     let iconKey: string = 'up';
 
-    if (newPrice < oldPrice) {
+    if (currentPrice < prevPrice) {
         iconKey = 'down';
     }
 
     const { icon, color } = icons[iconKey];
 
     return (
-        <Flex justify="space-between" style={{ color }}>
-            <span>{newPrice}</span>
+        <Space size='middle' style={{ color }}>
+            <span>{currentPrice}</span>
             <span>{icon}</span>
-        </Flex>
+        </Space>
     );
 }

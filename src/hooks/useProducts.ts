@@ -1,35 +1,60 @@
 import { useState, useEffect } from 'react';
-import type { Product } from '../types';
-import { getProducts } from '../lib/products';
+import type { Company, Product } from '../types';
+import { getProducts, getProductsTotalAmount } from '../lib/products';
 
-export function useProducts(pageNumber: number, pageSize: number) {
+export function useProducts(company: Company) {
     const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
+    const [pageNumber, setPageNumber] = useState<number>();
+    const [pageSize, setPageSize] = useState<number>();
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchProductsData = async () => {
+            const defaultPagination = {
+                pageNumber: 1,
+                pageSize: 10
+            };
+
             setLoading(true);
             setError(false);
 
             try {
-                const fetchedProducts = await getProducts(pageNumber, pageSize);
+                const fetchedTotal = await getProductsTotalAmount(company);
+                const fetchedProducts = await getProducts(
+                    company,
+                    pageNumber ?? defaultPagination.pageNumber,
+                    pageSize ?? defaultPagination.pageSize
+                );
+
+                setTotal(fetchedTotal);
                 setProducts(fetchedProducts);
-            } catch {
+            } catch (err) {
+                if (err instanceof Error) {
+                    console.error(err.message);
+                }
                 setError(true);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProducts();
-    }, [pageNumber, pageSize]);
+        fetchProductsData();
+    }, [pageNumber, pageSize, company]);
 
     return {
-        products,
-        loading,
-        error,
-        pageNumber,
-        pageSize
+        pagination: {
+            pageNumber,
+            pageSize,
+            total,
+            setPageNumber,
+            setPageSize
+        },
+        products: {
+            data: products,
+            loading,
+            error
+        }
     };
 }

@@ -1,14 +1,24 @@
 export type PriceData = {
     price?: number;
-    prevPrice?: number;
-    changeTimestamp?: number;
+    changedAt?: number;
 };
 
 export type Product = {
+    ean: string;
+    companyId: number;
+    name?: string;
     category?: string;
     imageUrl?: string;
-    brandName?: string;
-    ean?: string;
-    name?: string;
-    prices: PriceData;
+    url?: string;
+    prices: PriceData[];
+};
+
+export type Company = 'castorama';
+
+export type ProductsResponse = {
+    products: Product[];
+    pageSize: number;
+    pageNumber: number;
+    totalCount: number;
+    hasNextPage: boolean;
 };
