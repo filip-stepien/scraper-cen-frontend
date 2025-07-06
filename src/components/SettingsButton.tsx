@@ -15,9 +15,7 @@ export function SettingsButton() {
                 open={drawerOpen}
                 onClose={() => setDrawerOpen(false)}
             />
-            <Button type='primary' onClick={handleButtonClick}>
-                Ustawienia
-            </Button>
+            <Button onClick={handleButtonClick}>Ustawienia</Button>
         </>
     );
 }

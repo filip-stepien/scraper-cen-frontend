@@ -10,9 +10,9 @@ export function SearchBar() {
 
     return (
         <Search
-            placeholder="Szukaj po frazie..."
+            placeholder='Szukaj po frazie...'
             onSearch={handleSearch}
-            style={{ width: 200 }}
+            className='w-full!'
         />
     );
 }

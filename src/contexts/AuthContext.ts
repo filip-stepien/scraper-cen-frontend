@@ -1,8 +1,8 @@
 import { createContext, type Dispatch, type SetStateAction } from 'react';
 
 type AuthContextProps = {
-    authenticated: boolean;
-    setAuthenticated: Dispatch<SetStateAction<boolean>>;
+    authenticated: boolean | null;
+    setAuthenticated: Dispatch<SetStateAction<boolean | null>>;
 };
 
 export const AuthContext = createContext<AuthContextProps>({

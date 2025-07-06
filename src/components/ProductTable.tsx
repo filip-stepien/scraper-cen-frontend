@@ -10,6 +10,20 @@ type DataType = {
     key: string;
 } & Product;
 
+function filterUndefinedValues(product: Product): product is Required<Product> {
+    const isValid = (obj: Product | PriceData) =>
+        Object.values(obj).every(value => value !== undefined);
+
+    return isValid(product) && product.prices.every(isValid);
+}
+
+function getRowsFromProducts(products: Product[]): DataType[] {
+    return products.filter(filterUndefinedValues).map(product => ({
+        ...product,
+        key: product.ean
+    }));
+}
+
 function getLastPrices(prices: Required<PriceData>[]): {
     current: Required<PriceData> | null;
     prev: Required<PriceData> | null;
@@ -90,20 +104,6 @@ const columns: TableProps<DataType>['columns'] = [
     }
 ];
 
-function filterUndefinedValues(product: Product): product is Required<Product> {
-    const isValid = (obj: Product | PriceData) =>
-        Object.values(obj).every(value => value !== undefined);
-
-    return isValid(product) && product.prices.every(isValid);
-}
-
-function getRowsFromProducts(products: Product[]): DataType[] {
-    return products.filter(filterUndefinedValues).map(product => ({
-        ...product,
-        key: product.ean
-    }));
-}
-
 export function ProductTable() {
     const { products, pagination } = useProducts('castorama');
 
@@ -113,14 +113,10 @@ export function ProductTable() {
     };
 
     return (
-        <div
-            style={{
-                padding: '16px'
-            }}
-        >
+        <div className='p-4'>
             {products.error ? (
                 <Empty
-                    style={{ padding: '32px' }}
+                    className='p-8'
                     description='Wystąpił błąd przy pobieraniu produktów.'
                 />
             ) : (
@@ -128,12 +124,13 @@ export function ProductTable() {
                     size='small'
                     loading={products.loading}
                     locale={{
-                        emptyText: () => (
-                            <Empty
-                                description='Brak danych.'
-                                style={{ padding: '32px' }}
-                            />
-                        )
+                        emptyText: () =>
+                            !products.loading && (
+                                <Empty
+                                    description='Brak danych.'
+                                    className='p-8'
+                                />
+                            )
                     }}
                     columns={columns}
                     pagination={{

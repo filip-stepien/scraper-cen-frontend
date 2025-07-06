@@ -1,14 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
+    plugins: [tsconfigPaths(), react(), tailwindcss()],
     server: {
         proxy: {
             '/products': 'http://localhost:3000',
-            '/signIn': 'http://localhost:3000',
-            '/signOut': 'http://localhost:3000'
+            '/auth': 'http://localhost:3000'
         }
     }
 });
