@@ -11,10 +11,8 @@ export function AuthContextProvider({ children }: { children: JSX.Element }) {
             try {
                 await checkAuth();
                 setAuthenticated(true);
-                console.log('git');
             } catch {
                 setAuthenticated(false);
-                console.log('nie git');
             }
         };
 

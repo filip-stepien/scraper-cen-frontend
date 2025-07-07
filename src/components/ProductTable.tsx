@@ -5,6 +5,8 @@ import type { PriceData, Product } from '../types';
 import { useProducts } from '../hooks/useProducts';
 import { Thumbnail } from './Thumbnail';
 import { PriceIndicator } from './PriceIndicator';
+import { PriceChart } from './PriceChart';
+import { useProductTableSearch } from '@/hooks/useProductTableSearch';
 
 type DataType = {
     key: string;
@@ -18,8 +20,19 @@ function filterUndefinedValues(product: Product): product is Required<Product> {
 }
 
 function getRowsFromProducts(products: Product[]): DataType[] {
+    const getRandomFloat = (min: number, max: number) =>
+        Math.round(Math.random() * (max - min) + min);
+
+    const getRandomTimestamp = () =>
+        new Date(Math.random() * Date.now()).getTime();
+
     return products.filter(filterUndefinedValues).map(product => ({
         ...product,
+        // DEBUG
+        prices: new Array(20).fill(0).map(() => ({
+            price: getRandomFloat(50, 150),
+            changedAt: getRandomTimestamp()
+        })),
         key: product.ean
     }));
 }
@@ -41,94 +54,102 @@ function getLastPrices(prices: Required<PriceData>[]): {
     };
 }
 
-const columns: TableProps<DataType>['columns'] = [
-    {
-        title: 'Miniatura',
-        dataIndex: 'imageUrl',
-        width: '10%',
-        key: 'imageUrl',
-        align: 'center',
-        render: imgUrl => (
-            <Flex justify='center'>
-                <Thumbnail imageUrl={imgUrl} sizePx={80} />
-            </Flex>
-        )
-    },
-    {
-        title: 'Nazwa',
-        dataIndex: 'name',
-        key: 'name',
-        width: '30%'
-    },
-    {
-        title: 'EAN',
-        dataIndex: 'ean',
-        key: 'ean',
-        width: '12%'
-    },
-    {
-        title: 'Kategoria',
-        dataIndex: 'category',
-        key: 'category',
-        width: '20%'
-    },
-    {
-        title: 'Data aktualizacji',
-        dataIndex: 'prices',
-        key: 'prices',
-        width: 200,
-        render: (prices: Required<PriceData>[]) => {
-            const lastPrices = getLastPrices(prices);
-            return lastPrices.current
-                ? dayjs.unix(lastPrices.current.changedAt).format('DD.MM.YYYY')
-                : 'Brak danych.';
-        }
-    },
-    {
-        title: 'Aktualna cena',
-        dataIndex: 'prices',
-        key: 'prices',
-        width: 160,
-        fixed: 'right',
-        render: (prices: Required<PriceData>[]) => {
-            const { current, prev } = getLastPrices(prices);
-            return current ? (
-                <PriceIndicator
-                    prevPrice={prev?.price}
-                    currentPrice={current.price}
-                />
-            ) : (
-                'Brak danych.'
-            );
-        }
-    }
-];
-
 export function ProductTable() {
     const { products, pagination } = useProducts('castorama');
+    const { getColumnSearchProps } = useProductTableSearch<DataType>([
+        'name',
+        'ean'
+    ]);
 
     const handleTableChange: TableProps<DataType>['onChange'] = tablePage => {
         pagination.setPageNumber(tablePage.current);
         pagination.setPageSize(tablePage.pageSize);
     };
 
+    const columns: TableProps<DataType>['columns'] = [
+        {
+            title: 'Miniatura',
+            dataIndex: 'imageUrl',
+            width: '10%',
+            key: 'imageUrl',
+            align: 'center',
+            render: imgUrl => (
+                <Flex justify="center">
+                    <Thumbnail imageUrl={imgUrl} sizePx={80} />
+                </Flex>
+            )
+        },
+        {
+            title: 'Nazwa',
+            dataIndex: 'name',
+            key: 'name',
+            width: '30%',
+            ...getColumnSearchProps('name')
+        },
+        {
+            title: 'EAN',
+            dataIndex: 'ean',
+            key: 'ean',
+            width: '12%',
+            ...getColumnSearchProps('ean')
+        },
+        {
+            title: 'Kategoria',
+            dataIndex: 'category',
+            key: 'category',
+            width: '20%'
+        },
+        {
+            title: 'Data aktualizacji',
+            dataIndex: 'prices',
+            key: 'prices',
+            width: 200,
+            render: (prices: Required<PriceData>[]) => {
+                const lastPrices = getLastPrices(prices);
+                return lastPrices.current
+                    ? dayjs
+                          .unix(lastPrices.current.changedAt)
+                          .format('DD.MM.YYYY')
+                    : 'Brak danych.';
+            }
+        },
+        {
+            title: 'Aktualna cena',
+            dataIndex: 'prices',
+            key: 'prices',
+            width: 160,
+            fixed: 'right',
+            render: (prices: Required<PriceData>[]) => {
+                const { current, prev } = getLastPrices(prices);
+                return current ? (
+                    <PriceIndicator
+                        prevPrice={prev?.price}
+                        currentPrice={current.price}
+                    />
+                ) : (
+                    'Brak danych.'
+                );
+            }
+        }
+    ];
+
     return (
-        <div className='p-4'>
+        <div className="p-4">
             {products.error ? (
                 <Empty
-                    className='p-8'
-                    description='Wystąpił błąd przy pobieraniu produktów.'
+                    className="p-8"
+                    description="Wystąpił błąd przy pobieraniu produktów."
                 />
             ) : (
                 <Table<DataType>
-                    size='small'
+                    size="small"
                     loading={products.loading}
                     locale={{
                         emptyText: () =>
                             !products.loading && (
                                 <Empty
-                                    description='Brak danych.'
-                                    className='p-8'
+                                    description="Brak danych."
+                                    className="py-8"
                                 />
                             )
                     }}
@@ -140,7 +161,11 @@ export function ProductTable() {
                         locale: { items_per_page: ' / strona' }
                     }}
                     expandable={{
-                        expandedRowRender: () => <div>ceny</div>
+                        expandedRowRender: product => (
+                            <PriceChart
+                                data={product.prices as Required<PriceData>[]}
+                            />
+                        )
                     }}
                     dataSource={getRowsFromProducts(products.data)}
                     onChange={handleTableChange}

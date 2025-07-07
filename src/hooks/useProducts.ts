@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Company, Product } from '../types';
 import { getProducts, getProductsTotalAmount } from '../lib/products';
+import { AxiosError } from 'axios';
 
 export function useProducts(company: Company) {
     const [products, setProducts] = useState<Product[]>([]);
@@ -34,7 +35,10 @@ export function useProducts(company: Company) {
                 if (err instanceof Error) {
                     console.error(err.message);
                 }
-                setError(true);
+
+                if (err instanceof AxiosError) {
+                    setError(err.status !== 404);
+                }
             } finally {
                 setLoading(false);
             }

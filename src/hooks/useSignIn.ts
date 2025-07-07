@@ -11,9 +11,9 @@ export function useSignIn(form: FormInstance) {
 
     const handleSubmit = async ({ password }: { password: string }) => {
         try {
+            setLoading(true);
             await signIn(password);
             setAuthenticated(true);
-            setLoading(true);
         } catch (err) {
             if (err instanceof AxiosError && err.status === 401) {
                 setError('Błędne hasło.');

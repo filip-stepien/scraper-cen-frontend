@@ -39,11 +39,11 @@ function SettingTitle({ title, tooltip }: SettingTitleProps) {
             {tooltip ? (
                 <InfoLabel label={title} tooltip={tooltip} level={5} />
             ) : (
-                <Title level={5} className='m-0!'>
+                <Title level={5} className="m-0!">
                     {title}
                 </Title>
             )}
-            <Divider className='my-3!' />
+            <Divider className="my-3!" />
         </Flex>
     );
 }
@@ -51,56 +51,42 @@ function SettingTitle({ title, tooltip }: SettingTitleProps) {
 export function SettingsForm() {
     return (
         <Form
-            name='basic'
+            name="basic"
             initialValues={{ remember: true }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
-            autoComplete='off'
-            layout='vertical'
+            autoComplete="off"
+            layout="vertical"
         >
-            <SettingTitle title='Zmiana hasła' />
+            <SettingTitle title="Zmiana hasła" />
 
-            <Form.Item<FieldType> label='Nowe hasło' name='newPassword'>
-                <Input.Password placeholder='Wprowadź nowe hasło...' />
+            <Form.Item<FieldType>
+                label="Nowe hasło"
+                name="newPassword"
+                className="mb-4!"
+            >
+                <Input.Password placeholder="Wprowadź nowe hasło..." />
             </Form.Item>
 
             <Form.Item<FieldType>
-                label='Powtórz hasło'
-                name='reapeatNewPassword'
+                label="Powtórz hasło"
+                name="reapeatNewPassword"
             >
-                <Input.Password placeholder='Powtórz nowe hasło...' />
+                <Input.Password placeholder="Powtórz nowe hasło..." />
             </Form.Item>
 
-            <SettingTitle title='Dane' />
-
-            <Form.Item label='Ilość przechowywanych cen na produkt'>
-                <InputNumber className='w-full!' value={10} />
-            </Form.Item>
+            <SettingTitle title="Dane" />
 
             <Form.Item
-                className='mb-3!'
-                label={
-                    <InfoLabel
-                        label='Rozpocznij pobieranie danych o godzinie'
-                        tooltip='Godzina o której nastąpi pierwsza aktualizacja danych po uruchomieniu aplikacji.'
-                    />
-                }
+                label="Ilość przechowywanych cen na produkt"
+                className="mb-4!"
             >
-                <TimePicker
-                    format='HH:mm'
-                    className='w-full'
-                    value={null}
-                    placeholder='Wybierz godzinę...'
-                />
+                <InputNumber className="w-full!" value={10} />
             </Form.Item>
 
-            <Form.Item className='mb-6'>
-                <Checkbox>Zaraz po uruchomieniu aplikacji</Checkbox>
-            </Form.Item>
-
-            <Form.Item label='Następnie aktualizuj dane'>
+            <Form.Item label="Aktualizuj dane">
                 <Select
-                    defaultValue='6h'
+                    defaultValue="6h"
                     options={[
                         { value: '6h', label: 'Co 6 godzin' },
                         { value: '12h', label: 'Co 12 godzin' },
@@ -118,12 +104,33 @@ export function SettingsForm() {
             </Form.Item>
 
             <SettingTitle
-                title='Powiadomienia Telegram'
-                tooltip='Powiadomienia wysyłane do użytkowników, którzy zainicjowali kontakt z botem przez Telegram.'
+                title="Powiadomienia Telegram"
+                tooltip="Powiadomienia wysyłane do użytkowników, którzy zainicjowali kontakt z botem przez Telegram."
             />
 
-            <Form.Item className='mb-3!'>
+            <Form.Item className="mb-4!">
                 <Checkbox>Wysyłaj powiadomienia o aktualizacji danych</Checkbox>
+            </Form.Item>
+
+            <Form.Item
+                className="mb-0.5!"
+                label={
+                    <InfoLabel
+                        label="Wyślij powiadomienie o godzinie"
+                        tooltip="Godzina o której nastąpi pierwsza aktualizacja danych po uruchomieniu aplikacji."
+                    />
+                }
+            >
+                <TimePicker
+                    format="HH:mm"
+                    className="w-full"
+                    value={null}
+                    placeholder="Wybierz godzinę..."
+                />
+            </Form.Item>
+
+            <Form.Item>
+                <Checkbox>Zaraz po zakończeniu pobierania danych</Checkbox>
             </Form.Item>
 
             <ClearBotButton />

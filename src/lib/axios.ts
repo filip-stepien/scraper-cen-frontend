@@ -8,7 +8,7 @@ if (!baseURL) {
 
 export const axiosInstance = axios.create({
     baseURL,
-    timeout: 5000
+    timeout: 30_000
 });
 
 let onUnauthorizedCallback: (() => void) | null = null;
