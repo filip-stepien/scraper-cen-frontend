@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react';
-import type { Company, Product } from '../types';
-import { getProducts, getProductsTotalAmount } from '../lib/products';
+import type { Company, FilterResult, Product } from '../types';
+import { getProducts } from '../lib/products';
 import { AxiosError } from 'axios';
+import type { SorterResult } from 'antd/es/table/interface';
 
-export function useProducts(company: Company) {
+export function useProducts<TDataType>(company: Company) {
     const [products, setProducts] = useState<Product[]>([]);
     const [pageNumber, setPageNumber] = useState<number>();
     const [pageSize, setPageSize] = useState<number>();
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
+    const [filters, setFilters] = useState<FilterResult>();
+    const [sorters, setSorters] = useState<
+        SorterResult<TDataType> | SorterResult<TDataType>[]
+    >();
 
     useEffect(() => {
         const fetchProductsData = async () => {
@@ -22,15 +27,16 @@ export function useProducts(company: Company) {
             setError(false);
 
             try {
-                const fetchedTotal = await getProductsTotalAmount(company);
-                const fetchedProducts = await getProducts(
+                const productsData = await getProducts(
                     company,
                     pageNumber ?? defaultPagination.pageNumber,
-                    pageSize ?? defaultPagination.pageSize
+                    pageSize ?? defaultPagination.pageSize,
+                    filters,
+                    sorters
                 );
 
-                setTotal(fetchedTotal);
-                setProducts(fetchedProducts);
+                setTotal(productsData.total);
+                setProducts(productsData.products);
             } catch (err) {
                 if (err instanceof Error) {
                     console.error(err.message);
@@ -45,7 +51,7 @@ export function useProducts(company: Company) {
         };
 
         fetchProductsData();
-    }, [pageNumber, pageSize, company]);
+    }, [pageNumber, pageSize, sorters, filters, company]);
 
     return {
         pagination: {
@@ -59,6 +65,10 @@ export function useProducts(company: Company) {
             data: products,
             loading,
             error
+        },
+        aggregation: {
+            setSorters,
+            setFilters
         }
     };
 }

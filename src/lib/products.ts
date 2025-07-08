@@ -1,5 +1,12 @@
-import type { Company, Product, ProductsResponse } from '../types';
+import type { SorterResult } from 'antd/es/table/interface';
+import type {
+    Company,
+    FilterResult,
+    Product,
+    ProductsResponse
+} from '../types';
 import { axiosInstance } from './axios';
+import { isSorterArray } from './utils';
 
 export async function getProductsTotalAmount(
     company: Company
@@ -12,15 +19,43 @@ export async function getProductsTotalAmount(
     return data.totalCount;
 }
 
-export async function getProducts(
+function getProductSortParam<TDataType>(sorter?: SorterResult<TDataType>) {
+    const order = sorter?.order === 'descend' ? 'desc' : 'asc';
+    const field = sorter?.field;
+    return order && field ? `${field}:${order}` : undefined;
+}
+
+function getProductFilterParam(filter?: FilterResult) {
+    if (!filter) {
+        return;
+    }
+
+    return Object.keys(filter)
+        .map(fieldName => {
+            const field = filter[fieldName];
+            const query = field?.at(0);
+            return field && query ? `${fieldName}:${query}` : null;
+        })
+        .filter((paramStr): paramStr is string => Boolean(paramStr))
+        .join(',');
+}
+
+export async function getProducts<TDataType>(
     company: Company,
     pageNumber: number,
-    pageSize: number
-): Promise<Product[]> {
+    pageSize: number,
+    filter?: FilterResult,
+    sorter?: SorterResult<TDataType> | SorterResult<TDataType>[]
+): Promise<{ products: Product[]; total: number }> {
+    const filterBy = getProductFilterParam(filter);
+    const sortBy = isSorterArray(sorter)
+        ? sorter.map(getProductSortParam).join(',')
+        : getProductSortParam(sorter);
+
     const response = await axiosInstance.get(`/products/${company}`, {
-        params: { pageNumber, pageSize }
+        params: { pageNumber, pageSize, sortBy, filterBy }
     });
 
     const data = response.data as ProductsResponse;
-    return data.products;
+    return { products: data.products, total: data.totalCount };
 }

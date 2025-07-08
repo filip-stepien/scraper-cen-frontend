@@ -1,5 +1,4 @@
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import { Space } from 'antd';
 import type { JSX } from 'react';
 
 type Props = {
@@ -25,7 +24,7 @@ const icons: Record<string, Icon> = {
 
 export function PriceIndicator({ prevPrice, currentPrice }: Props) {
     if (!prevPrice || prevPrice === currentPrice) {
-        return <span>{currentPrice}</span>;
+        return;
     }
 
     let iconKey: string = 'up';
@@ -36,10 +35,5 @@ export function PriceIndicator({ prevPrice, currentPrice }: Props) {
 
     const { icon, color } = icons[iconKey];
 
-    return (
-        <Space size='middle' style={{ color }}>
-            <span>{currentPrice}</span>
-            <span>{icon}</span>
-        </Space>
-    );
+    return <span style={{ color }}>{icon}</span>;
 }

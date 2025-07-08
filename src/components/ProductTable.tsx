@@ -9,8 +9,15 @@ import { PriceChart } from './PriceChart';
 import { useProductTableSearch } from '@/hooks/useProductTableSearch';
 
 type DataType = {
-    key: string;
-} & Product;
+    ean?: string;
+    name?: string;
+    category?: string;
+    imageUrl?: string;
+    url?: string;
+    changedAt?: number;
+    price?: number;
+    prices?: PriceData[];
+};
 
 function filterUndefinedValues(product: Product): product is Required<Product> {
     const isValid = (obj: Product | PriceData) =>
@@ -41,27 +48,27 @@ function getLastPrices(prices: Required<PriceData>[]): {
     current: Required<PriceData> | null;
     prev: Required<PriceData> | null;
 } {
-    if (prices.length === 0) {
-        return { current: null, prev: null };
-    }
-
-    const sortedPrices = [...prices].sort((a, b) => b.changedAt - a.changedAt);
-
-    return {
-        current: sortedPrices[0],
-        //prev: sortedPrices.length > 1 ? sortedPrices[1] : null
-        prev: { changedAt: dayjs(0).unix(), price: 100 }
-    };
+    return prices.length === 0
+        ? { current: null, prev: null }
+        : {
+              current: [...prices].sort((a, b) => b.changedAt - a.changedAt)[0],
+              //prev: sortedPrices.length > 1 ? sortedPrices[1] : null
+              prev: { changedAt: dayjs(0).unix(), price: 100 }
+          };
 }
 
 export function ProductTable() {
-    const { products, pagination } = useProducts('castorama');
-    const { getColumnSearchProps } = useProductTableSearch<DataType>([
-        'name',
-        'ean'
-    ]);
+    const { columnSearchProps } = useProductTableSearch<DataType>();
+    const { products, pagination, aggregation } =
+        useProducts<DataType>('castorama');
 
-    const handleTableChange: TableProps<DataType>['onChange'] = tablePage => {
+    const handleTableChange: TableProps<DataType>['onChange'] = (
+        tablePage,
+        tableFilters,
+        sorters
+    ) => {
+        aggregation.setFilters(tableFilters);
+        aggregation.setSorters(sorters);
         pagination.setPageNumber(tablePage.current);
         pagination.setPageSize(tablePage.pageSize);
     };
@@ -73,6 +80,7 @@ export function ProductTable() {
             width: '10%',
             key: 'imageUrl',
             align: 'center',
+
             render: imgUrl => (
                 <Flex justify="center">
                     <Thumbnail imageUrl={imgUrl} sizePx={80} />
@@ -84,41 +92,77 @@ export function ProductTable() {
             dataIndex: 'name',
             key: 'name',
             width: '30%',
-            ...getColumnSearchProps('name')
+            sortDirections: ['ascend', 'descend'],
+            sorter: {
+                compare: () => 0,
+                multiple: 1
+            },
+            ...columnSearchProps
         },
         {
             title: 'EAN',
             dataIndex: 'ean',
             key: 'ean',
             width: '12%',
-            ...getColumnSearchProps('ean')
+            sortDirections: ['ascend', 'descend'],
+            sorter: {
+                compare: () => 0,
+                multiple: 1
+            },
+            ...columnSearchProps
         },
         {
             title: 'Kategoria',
             dataIndex: 'category',
             key: 'category',
-            width: '20%'
+            width: '20%',
+            sortDirections: ['ascend', 'descend'],
+            sorter: {
+                compare: () => 0,
+                multiple: 1
+            },
+            ...columnSearchProps
         },
         {
             title: 'Data aktualizacji',
-            dataIndex: 'prices',
-            key: 'prices',
+            dataIndex: 'changedAt',
+            key: 'changedAt',
             width: 200,
-            render: (prices: Required<PriceData>[]) => {
-                const lastPrices = getLastPrices(prices);
-                return lastPrices.current
-                    ? dayjs
-                          .unix(lastPrices.current.changedAt)
-                          .format('DD.MM.YYYY')
+            sortDirections: ['ascend', 'descend'],
+            sorter: {
+                compare: () => 0,
+                multiple: 1
+            },
+            render: (currChangeAt: number) => {
+                return currChangeAt
+                    ? dayjs.unix(currChangeAt).format('DD.MM.YYYY')
                     : 'Brak danych.';
-            }
+            },
+            ...columnSearchProps
         },
         {
             title: 'Aktualna cena',
-            dataIndex: 'prices',
-            key: 'prices',
-            width: 160,
+            dataIndex: 'price',
+            key: 'price',
+            width: 200,
             fixed: 'right',
+            sortDirections: ['ascend', 'descend'],
+            sorter: {
+                compare: () => 0,
+                multiple: 1
+            },
+            render: (text: string) => {
+                const num = Number(text);
+                return isNaN(num) ? 'Brak danych.' : num.toFixed(2);
+            },
+            ...columnSearchProps
+        },
+        {
+            title: '',
+            dataIndex: 'prices',
+            key: 'price',
+            fixed: 'right',
+            width: 50,
             render: (prices: Required<PriceData>[]) => {
                 const { current, prev } = getLastPrices(prices);
                 return current ? (
@@ -127,7 +171,7 @@ export function ProductTable() {
                         currentPrice={current.price}
                     />
                 ) : (
-                    'Brak danych.'
+                    ''
                 );
             }
         }

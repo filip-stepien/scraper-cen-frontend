@@ -1,35 +1,28 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Space, Button, type InputRef, Flex } from 'antd';
-import { type ChangeEventHandler, type RefObject } from 'react';
+import { useState, type ChangeEventHandler, type RefObject } from 'react';
 
 type Props = {
     searchInputRef: RefObject<InputRef | null>;
-    searchText?: string;
     onSearchText: (searchText: string) => void;
-    onSearch: (searchText: string) => void;
+    onSearch: () => void;
     onClear: () => void;
-    onClearAll: () => void;
+    onClose: () => void;
 };
 
 export function SearchDropdown(props: Props) {
-    const {
-        searchInputRef,
-        searchText,
-        onSearchText,
-        onSearch,
-        onClear,
-        onClearAll
-    } = props;
+    const { searchInputRef, onSearchText, onSearch, onClear, onClose } = props;
 
-    const handleSearch = () => {
-        const searchText = searchInputRef.current?.input?.value;
-        if (searchText !== undefined) {
-            onSearch(searchText);
-        }
-    };
+    const [value, setValue] = useState('');
 
     const handleSearchTextChange: ChangeEventHandler<HTMLInputElement> = e => {
+        setValue(e.target.value);
         onSearchText(e.target.value);
+    };
+
+    const handleClear = () => {
+        setValue('');
+        onClear();
     };
 
     return (
@@ -42,21 +35,21 @@ export function SearchDropdown(props: Props) {
             <Input
                 ref={searchInputRef}
                 placeholder="Wyszukaj..."
-                onPressEnter={handleSearch}
-                value={searchText}
+                onPressEnter={onSearch}
                 onChange={handleSearchTextChange}
+                value={value}
             />
             <Space className="flex">
                 <Button
                     type="primary"
-                    onClick={handleSearch}
+                    onClick={onSearch}
                     icon={<SearchOutlined />}
                 >
                     Szukaj
                 </Button>
-                <Button onClick={onClear}>Wyczyść</Button>
-                <Button type="link" onClick={onClearAll}>
-                    Wyczyść wszystkie filtry
+                <Button onClick={handleClear}>Wyczyść</Button>
+                <Button type="link" onClick={onClose}>
+                    Zamknij
                 </Button>
             </Space>
         </Flex>

@@ -1,3 +1,5 @@
+import type { SorterResult, FilterValue } from 'antd/es/table/interface';
+
 export type PriceData = {
     price?: number;
     changedAt?: number;
@@ -10,6 +12,8 @@ export type Product = {
     category?: string;
     imageUrl?: string;
     url?: string;
+    price?: number;
+    changedAt?: number;
     prices: PriceData[];
 };
 
@@ -22,3 +26,5 @@ export type ProductsResponse = {
     totalCount: number;
     hasNextPage: boolean;
 };
+
+export type FilterResult = Record<string, FilterValue | null>;
