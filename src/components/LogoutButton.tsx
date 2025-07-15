@@ -1,15 +1,11 @@
 import { Button } from 'antd';
-import { useAuth } from '../hooks/useAuth';
+import { useSignOut } from '@/hooks/useSignOut';
 
 export function LogoutButton() {
-    const { setAuthenticated } = useAuth();
-
-    const click = () => {
-        setAuthenticated(false);
-    };
+    const { loading, signOut } = useSignOut();
 
     return (
-        <Button onClick={click} type='primary'>
+        <Button onClick={signOut} loading={loading} type="primary">
             Wyloguj
         </Button>
     );
