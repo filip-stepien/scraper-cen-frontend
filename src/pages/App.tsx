@@ -1,8 +1,6 @@
 import { Button, Flex } from 'antd';
 import { ProductTable } from '@/components/ProductTable';
 import { CompanySelect } from '@/components/CompanySelect';
-import { SettingsButton } from '@/components/SettingsButton';
-import { StatusButton } from '@/components/StatusButton';
 import { LogoutButton } from '@/components/LogoutButton';
 import { useRerender } from '@/hooks/useRerender';
 
@@ -21,8 +19,8 @@ export function App() {
                         <Button onClick={rerender}>Wyczyść filtry</Button>
                     </Flex>
                     <Flex gap="small">
-                        <StatusButton />
-                        <SettingsButton />
+                        {/* <StatusButton />
+                        <SettingsButton /> */}
                         <LogoutButton />
                     </Flex>
                 </Flex>

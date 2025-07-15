@@ -27,19 +27,8 @@ function filterUndefinedValues(product: Product): product is Required<Product> {
 }
 
 function getRowsFromProducts(products: Product[]): DataType[] {
-    const getRandomFloat = (min: number, max: number) =>
-        Math.round(Math.random() * (max - min) + min);
-
-    const getRandomTimestamp = () =>
-        new Date(Math.random() * Date.now()).getTime();
-
     return products.filter(filterUndefinedValues).map(product => ({
         ...product,
-        // DEBUG
-        prices: new Array(20).fill(0).map(() => ({
-            price: getRandomFloat(50, 150),
-            changedAt: getRandomTimestamp()
-        })),
         key: product.ean
     }));
 }
@@ -48,12 +37,12 @@ function getLastPrices(prices: Required<PriceData>[]): {
     current: Required<PriceData> | null;
     prev: Required<PriceData> | null;
 } {
+    const sortedPrices = [...prices].sort((a, b) => b.changedAt - a.changedAt);
     return prices.length === 0
         ? { current: null, prev: null }
         : {
-              current: [...prices].sort((a, b) => b.changedAt - a.changedAt)[0],
-              //prev: sortedPrices.length > 1 ? sortedPrices[1] : null
-              prev: { changedAt: dayjs(0).unix(), price: 100 }
+              current: sortedPrices[0],
+              prev: sortedPrices.length > 1 ? sortedPrices[1] : null
           };
 }
 
@@ -153,7 +142,7 @@ export function ProductTable() {
             },
             render: (text: string) => {
                 const num = Number(text);
-                return isNaN(num) ? 'Brak danych.' : num.toFixed(2);
+                return isNaN(num) ? 'Brak danych.' : num.toFixed(2) + ' zł';
             },
             ...columnSearchProps
         },
