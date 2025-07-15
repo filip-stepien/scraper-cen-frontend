@@ -1,4 +1,4 @@
-import type { SorterResult, FilterValue } from 'antd/es/table/interface';
+import type { FilterValue } from 'antd/es/table/interface';
 
 export type PriceData = {
     price?: number;
