@@ -4,9 +4,9 @@ import type { TableProps } from 'antd';
 import type { PriceData, Product } from '../types';
 import { useProducts } from '../hooks/useProducts';
 import { Thumbnail } from './Thumbnail';
-import { PriceIndicator } from './PriceIndicator';
 import { PriceChart } from './PriceChart';
 import { useProductTableSearch } from '@/hooks/useProductTableSearch';
+import { PriceCell } from './PriceCell';
 
 type DataType = {
     ean?: string;
@@ -31,19 +31,6 @@ function getRowsFromProducts(products: Product[]): DataType[] {
         ...product,
         key: product.ean
     }));
-}
-
-function getLastPrices(prices: Required<PriceData>[]): {
-    current: Required<PriceData> | null;
-    prev: Required<PriceData> | null;
-} {
-    const sortedPrices = [...prices].sort((a, b) => b.changedAt - a.changedAt);
-    return prices.length === 0
-        ? { current: null, prev: null }
-        : {
-              current: sortedPrices[0],
-              prev: sortedPrices.length > 1 ? sortedPrices[1] : null
-          };
 }
 
 export function ProductTable() {
@@ -86,6 +73,11 @@ export function ProductTable() {
                 compare: () => 0,
                 multiple: 1
             },
+            render: (name, record) => (
+                <a href={record.url} target="_blank" className="underline">
+                    {name}
+                </a>
+            ),
             ...columnSearchProps
         },
         {
@@ -133,36 +125,20 @@ export function ProductTable() {
             title: 'Aktualna cena',
             dataIndex: 'price',
             key: 'price',
-            width: 200,
+            width: 250,
             fixed: 'right',
             sortDirections: ['ascend', 'descend'],
             sorter: {
                 compare: () => 0,
                 multiple: 1
             },
-            render: (text: string) => {
-                const num = Number(text);
-                return isNaN(num) ? 'Brak danych.' : num.toFixed(2) + ' zł';
-            },
-            ...columnSearchProps
-        },
-        {
-            title: '',
-            dataIndex: 'prices',
-            key: 'price',
-            fixed: 'right',
-            width: 50,
-            render: (prices: Required<PriceData>[]) => {
-                const { current, prev } = getLastPrices(prices);
-                return current ? (
-                    <PriceIndicator
-                        prevPrice={prev?.price}
-                        currentPrice={current.price}
-                    />
-                ) : (
-                    ''
-                );
-            }
+            render: (text, record) => (
+                <PriceCell
+                    priceText={text}
+                    allPrices={record.prices as Required<PriceData>[]}
+                    changedAt={record.changedAt as number}
+                />
+            )
         }
     ];
 
