@@ -1,5 +1,4 @@
 import { Empty, Flex, Table } from 'antd';
-import dayjs from 'dayjs';
 import type { TableProps } from 'antd';
 import type { PriceData, Product } from '../types';
 import { useProducts } from '../hooks/useProducts';
@@ -7,6 +6,7 @@ import { Thumbnail } from './Thumbnail';
 import { PriceChart } from './PriceChart';
 import { useProductTableSearch } from '@/hooks/useProductTableSearch';
 import { PriceCell } from './PriceCell';
+import { ChangedDateCell } from './ChangedDateCell';
 
 type DataType = {
     ean?: string;
@@ -108,24 +108,24 @@ export function ProductTable() {
             title: 'Data aktualizacji',
             dataIndex: 'changedAt',
             key: 'changedAt',
-            width: 200,
+            width: 220,
             sortDirections: ['ascend', 'descend'],
             sorter: {
                 compare: () => 0,
                 multiple: 1
             },
-            render: (currChangeAt: number) => {
-                return currChangeAt
-                    ? dayjs.unix(currChangeAt).format('DD.MM.YYYY')
-                    : 'Brak danych.';
-            },
-            ...columnSearchProps
+            render: (changedAt: number, record) => (
+                <ChangedDateCell
+                    changedAt={changedAt}
+                    hidden={record?.prices ? record.prices.length <= 1 : true}
+                />
+            )
         },
         {
             title: 'Aktualna cena',
             dataIndex: 'price',
             key: 'price',
-            width: 250,
+            width: 260,
             fixed: 'right',
             sortDirections: ['ascend', 'descend'],
             sorter: {

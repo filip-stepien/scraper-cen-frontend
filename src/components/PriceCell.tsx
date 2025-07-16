@@ -2,26 +2,13 @@ import { Flex, Space } from 'antd';
 import { IconPriceIndicator } from './IconPriceIndicator';
 import { PercentagePriceIndicator } from './PercentagePriceIndicator';
 import type { PriceData } from '@/types';
-import dayjs from 'dayjs';
+import { isProductNew } from '@/lib/products';
 
 type Props = {
     priceText: string;
     allPrices: Required<PriceData>[];
     changedAt: number;
 };
-
-function shouldDisplayPriceIndicators(changedAt?: number) {
-    const hours = Number(import.meta.env.VITE_PRICE_LOOKBACK_HOURS);
-
-    if (!changedAt || !hours || isNaN(hours)) {
-        return false;
-    }
-
-    const changedAtDate = dayjs.unix(changedAt);
-    const cutoff = dayjs().subtract(hours, 'hour');
-
-    return changedAtDate.isAfter(cutoff);
-}
 
 function formatPrice(num: number) {
     return num.toFixed(2).toString().replace(/\./, ',') + ' zł';
@@ -48,8 +35,7 @@ export function PriceCell({ allPrices, priceText, changedAt }: Props) {
         return 'Brak danych.';
     }
 
-    const displayIndicators =
-        prev?.price && shouldDisplayPriceIndicators(changedAt);
+    const displayIndicators = prev?.price && isProductNew(changedAt);
 
     const lookbackHours: string | undefined = import.meta.env
         .VITE_PRICE_LOOKBACK_HOURS;

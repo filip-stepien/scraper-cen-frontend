@@ -7,6 +7,7 @@ import type {
 } from '../types';
 import { axiosInstance } from './axios';
 import { isSorterArray } from './utils';
+import dayjs from 'dayjs';
 
 export async function getProductsTotalAmount(
     company: Company
@@ -58,4 +59,17 @@ export async function getProducts<TDataType>(
 
     const data = response.data as ProductsResponse;
     return { products: data.products, total: data.totalCount };
+}
+
+export function isProductNew(changedAt?: number) {
+    const hours = Number(import.meta.env.VITE_PRICE_LOOKBACK_HOURS);
+
+    if (!changedAt || !hours || isNaN(hours)) {
+        return false;
+    }
+
+    const changedAtDate = dayjs.unix(changedAt);
+    const cutoff = dayjs().subtract(hours, 'hour');
+
+    return changedAtDate.isAfter(cutoff);
 }
