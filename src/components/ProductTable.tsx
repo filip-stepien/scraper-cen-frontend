@@ -59,10 +59,8 @@ export function ProductTable({ externalFilters = {} }: Props) {
         {
             title: 'Miniatura',
             dataIndex: 'imageUrl',
-            width: '10%',
             key: 'imageUrl',
             align: 'center',
-
             render: imgUrl => (
                 <Flex justify="center">
                     <Thumbnail imageUrl={imgUrl} sizePx={80} />
@@ -73,7 +71,6 @@ export function ProductTable({ externalFilters = {} }: Props) {
             title: 'Nazwa',
             dataIndex: 'name',
             key: 'name',
-            width: '30%',
             sortDirections: ['ascend', 'descend'],
             sorter: {
                 compare: () => 0,
@@ -90,7 +87,6 @@ export function ProductTable({ externalFilters = {} }: Props) {
             title: 'EAN',
             dataIndex: 'ean',
             key: 'ean',
-            width: '12%',
             sortDirections: ['ascend', 'descend'],
             sorter: {
                 compare: () => 0,
@@ -102,7 +98,6 @@ export function ProductTable({ externalFilters = {} }: Props) {
             title: 'Kategoria',
             dataIndex: 'category',
             key: 'category',
-            width: '20%',
             sortDirections: ['ascend', 'descend'],
             sorter: {
                 compare: () => 0,
@@ -114,7 +109,7 @@ export function ProductTable({ externalFilters = {} }: Props) {
             title: 'Data aktualizacji',
             dataIndex: 'changedAt',
             key: 'changedAt',
-            width: 220,
+            width: 200,
             sortDirections: ['ascend', 'descend'],
             sorter: {
                 compare: () => 0,
@@ -128,7 +123,7 @@ export function ProductTable({ externalFilters = {} }: Props) {
             title: 'Aktualna cena',
             dataIndex: 'price',
             key: 'price',
-            width: 260,
+            width: 200,
             fixed: 'right',
             sortDirections: ['ascend', 'descend'],
             sorter: {
