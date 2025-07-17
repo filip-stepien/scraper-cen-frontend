@@ -1,12 +1,16 @@
 import { Empty, Flex, Table } from 'antd';
 import type { TableProps } from 'antd';
-import type { PriceData, Product } from '../types';
+import type { FilterResult, PriceData, Product } from '../types';
 import { useProducts } from '../hooks/useProducts';
 import { Thumbnail } from './Thumbnail';
 import { PriceChart } from './PriceChart';
 import { useProductTableSearch } from '@/hooks/useProductTableSearch';
 import { PriceCell } from './PriceCell';
 import { ChangedDateCell } from './ChangedDateCell';
+
+type Props = {
+    externalFilters?: FilterResult;
+};
 
 type DataType = {
     ean?: string;
@@ -33,18 +37,20 @@ function getRowsFromProducts(products: Product[]): DataType[] {
     }));
 }
 
-export function ProductTable() {
+export function ProductTable({ externalFilters = {} }: Props) {
     const { columnSearchProps } = useProductTableSearch<DataType>();
-    const { products, pagination, aggregation } =
-        useProducts<DataType>('castorama');
+    const { products, pagination, aggregation } = useProducts<DataType>(
+        'castorama',
+        externalFilters
+    );
 
     const handleTableChange: TableProps<DataType>['onChange'] = (
         tablePage,
         tableFilters,
         sorters
     ) => {
-        aggregation.setFilters(tableFilters);
         aggregation.setSorters(sorters);
+        aggregation.setFilters({ ...tableFilters, ...externalFilters });
         pagination.setPageNumber(tablePage.current);
         pagination.setPageSize(tablePage.pageSize);
     };
@@ -114,11 +120,8 @@ export function ProductTable() {
                 compare: () => 0,
                 multiple: 1
             },
-            render: (changedAt: number, record) => (
-                <ChangedDateCell
-                    changedAt={changedAt}
-                    hidden={record?.prices ? record.prices.length <= 1 : true}
-                />
+            render: (changedAt: number) => (
+                <ChangedDateCell changedAt={changedAt} />
             )
         },
         {

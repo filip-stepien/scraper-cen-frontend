@@ -4,14 +4,19 @@ import { getProducts } from '../lib/products';
 import { AxiosError } from 'axios';
 import type { SorterResult } from 'antd/es/table/interface';
 
-export function useProducts<TDataType>(company: Company) {
+export function useProducts<TDataType>(
+    company: Company,
+    externalFilters?: FilterResult
+) {
     const [products, setProducts] = useState<Product[]>([]);
     const [pageNumber, setPageNumber] = useState<number>();
     const [pageSize, setPageSize] = useState<number>();
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
-    const [filters, setFilters] = useState<FilterResult>();
+    const [filters, setFilters] = useState<FilterResult | undefined>(
+        externalFilters
+    );
     const [sorters, setSorters] = useState<
         SorterResult<TDataType> | SorterResult<TDataType>[]
     >();
