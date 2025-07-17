@@ -71,7 +71,7 @@ export function PriceChart({ data }: Props) {
             options={options}
             data={{
                 labels: data.map(entry =>
-                    dayjs.unix(entry.changedAt).format('MM.DD.YYYY')
+                    dayjs.unix(entry.changedAt).format('DD.MM.YYYY')
                 ),
                 datasets: [
                     {
