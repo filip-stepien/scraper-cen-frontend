@@ -50,7 +50,7 @@ export function ProductTable({ externalFilters = {} }: Props) {
         sorters
     ) => {
         aggregation.setSorters(sorters);
-        aggregation.setFilters({ ...tableFilters, ...externalFilters });
+        aggregation.setFilters(tableFilters);
         pagination.setPageNumber(tablePage.current);
         pagination.setPageSize(tablePage.pageSize);
     };

@@ -19,8 +19,6 @@ export function useNewProductsFilter() {
             setFilterActive(true);
             setFilter({ changedAt: [`>${filterTimestamp}`] });
         }
-
-        rerender();
     };
 
     const onReset = () => {

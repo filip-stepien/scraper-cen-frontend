@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Company, FilterResult, Product } from '../types';
 import { getProducts } from '../lib/products';
 import { AxiosError } from 'axios';
 import type { SorterResult } from 'antd/es/table/interface';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 export function useProducts<TDataType>(
     company: Company,
@@ -21,7 +22,7 @@ export function useProducts<TDataType>(
         SorterResult<TDataType> | SorterResult<TDataType>[]
     >();
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         const fetchProductsData = async () => {
             const defaultPagination = {
                 pageNumber: 1,
@@ -36,7 +37,7 @@ export function useProducts<TDataType>(
                     company,
                     pageNumber ?? defaultPagination.pageNumber,
                     pageSize ?? defaultPagination.pageSize,
-                    filters,
+                    { ...filters, ...externalFilters },
                     sorters
                 );
 
@@ -56,7 +57,7 @@ export function useProducts<TDataType>(
         };
 
         fetchProductsData();
-    }, [pageNumber, pageSize, sorters, filters, company]);
+    }, [pageNumber, pageSize, sorters, filters, company, externalFilters]);
 
     return {
         pagination: {
