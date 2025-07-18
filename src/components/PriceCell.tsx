@@ -37,13 +37,6 @@ export function PriceCell({ allPrices, priceText, changedAt }: Props) {
 
     const displayIndicators = prev?.price && isProductNew(changedAt);
 
-    const lookbackHours: string | undefined = import.meta.env
-        .VITE_PRICE_LOOKBACK_HOURS;
-
-    const lastUpdateLabel =
-        'Poprzednia cena' +
-        (lookbackHours ? ` (ostatnie ${lookbackHours}h):` : ':');
-
     return (
         <Flex vertical>
             <Space>
@@ -57,7 +50,7 @@ export function PriceCell({ allPrices, priceText, changedAt }: Props) {
             </Space>
             {displayIndicators && (
                 <Flex vertical className="text-font-secondary text-xs">
-                    <span>{lastUpdateLabel}</span>
+                    <span>Poprzednia cena</span>
                     <div>
                         <span className="font-bold">
                             {formatPrice(prev.price)}{' '}

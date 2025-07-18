@@ -4,17 +4,20 @@ import { Button, Space, Tooltip } from 'antd';
 type Props = {
     clicked?: boolean;
     onClick?: () => void;
+    className?: string;
 };
 
 const lookbackHours = import.meta.env.VITE_PRICE_LOOKBACK_HOURS;
 
-export function DisplayNewProductsButton({ clicked, onClick }: Props) {
+export function DisplayNewProductsButton(props: Props) {
+    const { clicked, onClick, className } = props;
     return (
         lookbackHours && (
-            <Space className="flex items-center">
+            <Space className="flex items-center ">
                 <Button
                     type={clicked ? 'primary' : 'default'}
                     onClick={() => onClick?.()}
+                    className={className}
                 >
                     Pokaż tylko nowe
                 </Button>

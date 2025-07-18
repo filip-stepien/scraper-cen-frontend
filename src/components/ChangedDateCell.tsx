@@ -10,11 +10,11 @@ export function ChangedDateCell({ changedAt }: Props) {
     const isNew = isProductNew(changedAt);
 
     return changedAt ? (
-        <Flex className="gap-2.5">
+        <Flex className="gap-2.5" align="center">
             <span>{dayjs.unix(changedAt).format('DD.MM.YYYY')}</span>
             {isNew && (
                 <Tag className="w-fit" color="blue">
-                    <span className="!text-[0.9em]">Nowe dane</span>
+                    <span className="!text-xs">Nowe dane</span>
                 </Tag>
             )}
         </Flex>

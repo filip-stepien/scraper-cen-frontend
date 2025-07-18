@@ -26,7 +26,7 @@ export function useProducts<TDataType>(
         const fetchProductsData = async () => {
             const defaultPagination = {
                 pageNumber: 1,
-                pageSize: 10
+                pageSize: 20
             };
 
             setLoading(true);

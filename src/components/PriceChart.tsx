@@ -26,6 +26,8 @@ ChartJS.register(
 
 type Props = {
     data: Required<PriceData>[];
+    height?: number;
+    fontSize?: number;
 };
 
 const options: any = {
@@ -64,10 +66,10 @@ const options: any = {
     }
 };
 
-export function PriceChart({ data }: Props) {
+export function PriceChart({ data, height = 300 }: Props) {
     return (
         <Line
-            height={300}
+            height={height}
             options={options}
             data={{
                 labels: data.map(entry =>

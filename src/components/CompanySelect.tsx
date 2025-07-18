@@ -1,6 +1,10 @@
 import { Select, type SelectProps } from 'antd';
 
-export function CompanySelect() {
+type Props = {
+    className?: string;
+};
+
+export function CompanySelect({ className }: Props) {
     const handleChange = (value: string) => {
         console.log(`selected ${value}`);
     };
@@ -11,6 +15,7 @@ export function CompanySelect() {
 
     return (
         <Select
+            className={className}
             defaultValue={options.at(0)?.value?.toString()}
             onChange={handleChange}
             options={options}

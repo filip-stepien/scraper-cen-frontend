@@ -12,32 +12,33 @@ export function LoginForm() {
     return (
         <Form
             form={form}
-            name='login'
+            name="login"
             onFinish={handleSubmit}
-            autoComplete='off'
-            layout='vertical'
+            autoComplete="off"
+            layout="vertical"
             requiredMark={label => <div>{label}</div>}
             onInput={clearError}
+            className="!w-full"
         >
             <Form.Item<FieldType>
-                label='Hasło dostępu'
-                name='password'
-                className='w-[300px]'
+                label="Hasło dostępu"
+                name="password"
+                className="w-full sm:w-[300px]"
                 rules={[{ required: true, message: '' }]}
                 validateStatus={error === null ? '' : 'error'}
                 help={error}
             >
                 <Input.Password
-                    placeholder='Wprowadź hasło...'
-                    className='w-full'
+                    placeholder="Wprowadź hasło..."
+                    className="w-full"
                     disabled={loading}
                 />
             </Form.Item>
-            <Form.Item label={null} className='w-[300px] pt-1.5!'>
+            <Form.Item label={null} className="w-full sm:w-[300px] pt-1.5!">
                 <Button
-                    type='primary'
-                    htmlType='submit'
-                    className='w-full'
+                    type="primary"
+                    htmlType="submit"
+                    className="w-full"
                     loading={loading}
                 >
                     Zaloguj

@@ -1,5 +1,5 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { Input, Space, Button, type InputRef, Flex } from 'antd';
+import { Input, Button, type InputRef, Flex } from 'antd';
 import { useState, type ChangeEventHandler, type RefObject } from 'react';
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
 };
 
 export function SearchDropdown(props: Props) {
-    const { searchInputRef, onSearchText, onSearch, onClear, onClose } = props;
+    const { searchInputRef, onSearchText, onSearch, onClear } = props;
 
     const [value, setValue] = useState('');
 
@@ -28,7 +28,7 @@ export function SearchDropdown(props: Props) {
     return (
         <Flex
             vertical
-            className="p-small!"
+            className="p-small! !w-fit"
             gap="small"
             onKeyDown={e => e.stopPropagation()}
         >
@@ -38,20 +38,24 @@ export function SearchDropdown(props: Props) {
                 onPressEnter={onSearch}
                 onChange={handleSearchTextChange}
                 value={value}
+                className="!text-sm"
             />
-            <Space className="flex">
+            <Flex className="w-full" justify="space-around" gap="small">
                 <Button
                     type="primary"
                     onClick={onSearch}
                     icon={<SearchOutlined />}
+                    className="!text-xs !py-0 !px-2.5 sm:px-4 lg:!text-sm lg:!py-2 !w-full"
                 >
                     Szukaj
                 </Button>
-                <Button onClick={handleClear}>Wyczyść</Button>
-                <Button type="link" onClick={onClose}>
-                    Zamknij
+                <Button
+                    onClick={handleClear}
+                    className="!text-xs !py-0 !px-2.5 sm:px-4 lg:!text-sm lg:!py-2 !w-full"
+                >
+                    Wyczyść
                 </Button>
-            </Space>
+            </Flex>
         </Flex>
     );
 }

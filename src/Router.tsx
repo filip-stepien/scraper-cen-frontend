@@ -1,7 +1,7 @@
 import { useAuth } from './hooks/useAuth';
 import { App } from './pages/App';
-import { Login } from './pages/Login';
 import { Loading } from './pages/Loading';
+import { Login } from './pages/Login';
 
 export function Router() {
     const { authenticated } = useAuth();
